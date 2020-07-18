@@ -18,7 +18,7 @@ Que souhaitez-vous que votre programme fasse ?
 - Le programme doit comporter une base de données en relation avec l'API OpenFoodFacts.
 - Le programme doit ensuite sélectionner l'aliment à remplacer.
 - Le programme doit enfin proposer des subsituts à cet aliment :
-    - Les Données de l'aliment.
+  - Les Données de l'aliment.
     - Le lien OpenFoodFacts.
 - Le programme doit enregistrer le résultat dans la base de données.
 
