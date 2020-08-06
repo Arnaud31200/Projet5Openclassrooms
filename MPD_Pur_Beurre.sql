@@ -8,19 +8,19 @@ SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
 
 -- -----------------------------------------------------
--- Schema Pur_Beurre_Base_de_Donnees
+-- Schema purbeurre
 -- -----------------------------------------------------
 
 -- -----------------------------------------------------
--- Schema Pur_Beurre_Base_de_Donnees
+-- Schema purbeurre
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `Pur_Beurre_Base_de_Donnees` DEFAULT CHARACTER SET utf8 ;
-USE `Pur_Beurre_Base_de_Donnees` ;
+CREATE SCHEMA IF NOT EXISTS `purbeurre` DEFAULT CHARACTER SET utf8 ;
+USE `purbeurre` ;
 
 -- -----------------------------------------------------
--- Table `Pur_Beurre_Base_de_Donnees`.`storage`
+-- Table `purbeurre`.`storage`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `Pur_Beurre_Base_de_Donnees`.`storage` (
+CREATE TABLE IF NOT EXISTS `purbeurre`.`storage` (
   `start_food` INT NOT NULL,
   `substitute_food` INT NOT NULL,
   INDEX `id_start` (`start_food` ASC) VISIBLE,
@@ -29,45 +29,41 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `Pur_Beurre_Base_de_Donnees`.`food_datas`
+-- Table `purbeurre`.`food_datas`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `Pur_Beurre_Base_de_Donnees`.`food_datas` (
-  `Id's` INT NOT NULL,
+CREATE TABLE IF NOT EXISTS `purbeurre`.`food_datas` (
+  `id` INT NOT NULL,
   `name` VARCHAR(45) NOT NULL,
   `brand` VARCHAR(45) NOT NULL,
   `nutriscore` CHAR(1) NOT NULL,
   `store` VARCHAR(45) NOT NULL,
   `URL` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`Id's`),
-  UNIQUE INDEX `Id's_UNIQUE` (`Id's` ASC) VISIBLE,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE,
   INDEX `nutriscore` (`nutriscore` ASC) VISIBLE,
   CONSTRAINT `key_start`
-    FOREIGN KEY (`Id's`)
-    REFERENCES `Pur_Beurre_Base_de_Donnees`.`storage` (`start_food`)
+    FOREIGN KEY (`id`)
+    REFERENCES `purbeurre`.`storage` (`start_food`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `key_substitute`
-    FOREIGN KEY (`Id's`)
-    REFERENCES `Pur_Beurre_Base_de_Donnees`.`storage` (`substitute_food`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    FOREIGN KEY (`id`)
+    REFERENCES `purbeurre`.`storage` (`substitute_food`))
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `Pur_Beurre_Base_de_Donnees`.`categories`
+-- Table `purbeurre`.`categories`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `Pur_Beurre_Base_de_Donnees`.`categories` (
+CREATE TABLE IF NOT EXISTS `purbeurre`.`categories` (
   `category_id` INT NOT NULL,
   `category` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`category_id`, `category`),
   UNIQUE INDEX `category` (`category` ASC) VISIBLE,
   CONSTRAINT `Key_food`
     FOREIGN KEY (`category_id`)
-    REFERENCES `Pur_Beurre_Base_de_Donnees`.`food_datas` (`Id's`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION);
-
+    REFERENCES `purbeurre`.`food_datas` (`id`))
+ENGINE = InnoDB;
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
