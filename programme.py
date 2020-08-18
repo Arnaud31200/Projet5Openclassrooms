@@ -5,10 +5,6 @@ import mysql.connector
 import json
 import urllib.request
 
-url = urllib.request.urlopen('https://fr.openfoodfacts.org/categorie/pates-a-tartiner/1.json')
-json_data= url.read()
-json_obj = [json.loads(json_data)]
-
 cnx = connection.MySQLConnection(user='root', password='Arnaud31',
                                  host='127.0.0.1',
                                  database='purbeurre')
@@ -26,29 +22,23 @@ TABLES['storage'] = (
 
 TABLES['food_datas'] = (
     "CREATE TABLE IF NOT EXISTS `food_datas` ("
-    "`id` INT NOT NULL,"
-    "`generic_name_fr` VARCHAR(45) NOT NULL,"
-    "`brands_tags` VARCHAR(45) NOT NULL,"
-    "`nutrition_grade_fr` CHAR(1) NOT NULL,"
-    "`stores` VARCHAR(45) NOT NULL,"
-    "`image_url` VARCHAR(45) NOT NULL,"
+    "`id` INT NOT NULL AUTO_INCREMENT,"
+    "`product_name` VARCHAR(70) NOT NULL,"
+    "`brands` VARCHAR(70) NOT NULL,"
+    "`nutrition_grade_fr` VARCHAR(70) NOT NULL,"
+    "`stores` VARCHAR(70),"
+    "`image_url` VARCHAR(100) NOT NULL,"
     "PRIMARY KEY (`id`),"
     "UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE,"
-    "INDEX `nutrition_grade_fr` (`nutrition_grade_fr` ASC) VISIBLE,"
-    "CONSTRAINT `key_start` FOREIGN KEY (`id`)"
-        "REFERENCES `purbeurre`.`storage` (`start_food`),"
-    "CONSTRAINT `key_substitute`FOREIGN KEY (`id`)"
-        "REFERENCES `purbeurre`.`storage` (`substitute_food`)"
+    "INDEX `nutrition_grade_fr` (`nutrition_grade_fr` ASC) VISIBLE"
     ") ENGINE = InnoDB;")
 
 TABLES['categories'] = (
   "CREATE TABLE IF NOT EXISTS `categories` ("
   "`category_id` INT NOT NULL AUTO_INCREMENT,"
   "`category` VARCHAR(100) NOT NULL,"
-  "PRIMARY KEY (`category_id`, `category`),"
-  "UNIQUE INDEX `category` (`category` ASC) VISIBLE,"
-  "CONSTRAINT `Key_food` FOREIGN KEY (`category_id`)"
-        "REFERENCES `purbeurre`.`food_datas` (`id`)"
+  "PRIMARY KEY (`category_id`),"
+  "UNIQUE INDEX `category` (`category_id` ASC) VISIBLE"
   ") ENGINE = InnoDB;")
 
 cnx = mysql.connector.connect(user='root', password='Arnaud31',
@@ -96,12 +86,38 @@ def validate_string(val):
             #   print(x)
             return str(val).encode('utf-8')
         else:
-            return val
+            if val == str(""):
+                return None
+            else:
+                return val.replace("'","_")
 
+categories = {"pates-a-tartiner" : 'https://fr.openfoodfacts.org/categorie/pates-a-tartiner/1.json', "popcorn" : 'https://fr.openfoodfacts.org/categorie/popcorn/1.json'}
 
-for i, item in enumerate(json_obj):
-    categories_fr = validate_string(item.get("categories", None))
-    cursor.execute(("INSERT INTO `categories` (category) VALUES (%(categories_fr)s)"), (categories_fr))
+for key in categories.keys() :
+    execute = f"INSERT INTO categories (category) VALUES ('{key}')"
+    cursor.execute(execute)
+    print(execute)
 
+cnx.commit()
+
+def find_key(values): 
+    for k, val in categories.items(): 
+        if val == values:
+            return k
+
+for values in categories.values():
+    json_obj = [json.loads((urllib.request.urlopen(values)).read())][0]['products']
+    for i, item in enumerate(json_obj) :
+        f"SELECT categories.category_id, categories.category FROM categories WHERE categories.category = {find_key(values)}"
+        product_name = validate_string(item.get("product_name", None))
+        brands = validate_string(item.get("brands", None))
+        nutrition_grade_fr = validate_string(item.get("nutrition_grade_fr", None))
+        stores = validate_string(item.get("stores", None))
+        image_url = validate_string(item.get("image_url", None))
+        execute = f"INSERT INTO food_datas (product_name, brands, nutrition_grade_fr, stores, image_url) VALUES ('{product_name}', '{brands}', '{nutrition_grade_fr}', '{stores}', '{image_url}')"
+        cursor.execute(execute)
+        print(execute)
+
+cnx.commit()
 cursor.close()
 cnx.close()
