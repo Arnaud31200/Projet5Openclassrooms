@@ -91,7 +91,7 @@ def validate_string(val):
             else:
                 return val.replace("'","_")
 
-categories = {"pates-a-tartiner" : 'https://fr.openfoodfacts.org/categorie/pates-a-tartiner/1.json', "popcorn" : 'https://fr.openfoodfacts.org/categorie/popcorn/1.json'}
+categories = {"pates-a-tartiner" : 'https://fr.openfoodfacts.org/categorie/pates-a-tartiner/1.json', "popcorn" : 'https://fr.openfoodfacts.org/categorie/popcorn/1.json', "brioches" : 'https://fr.openfoodfacts.org/categorie/brioches/1.json'}
 
 for key in categories.keys() :
     execute = f"INSERT INTO categories (category) VALUES ('{key}')"
