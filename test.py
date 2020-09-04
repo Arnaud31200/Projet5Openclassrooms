@@ -1,12 +1,19 @@
+
 from __future__ import print_function
 from mysql.connector import (connection)
 from mysql.connector import errorcode
 import mysql.connector
-import json
-import urllib.request
 
-url = urllib.request.urlopen('https://fr.openfoodfacts.org/categorie/pates-a-tartiner/1.json')
-json_data= url.read()
-json_obj = [json.loads(json_data)[0]['products']]
-products = json_obj[0]['products']
-print(products)
+cnx = connection.MySQLConnection(user='root', password='Arnaud31',
+                                 host='127.0.0.1',
+                                 database='purbeurre')
+
+class connection:
+    def __init__(self, user, password, host, database):
+        self.user = user
+        self.password = password
+        self.host = host
+        self.database = database
+    
+    def connect(self):
+        cnx = connection.MySQLConnection(user = self.user, password = self.password, host = self.host, database = self.database)
