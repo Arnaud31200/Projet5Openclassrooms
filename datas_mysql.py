@@ -35,7 +35,6 @@ class database_coordinates:
 class tables_description:
     def __init__(self):
         self.TABLES = {}
-    
         self.TABLES['storage'] = (
             "CREATE TABLE IF NOT EXISTS `storage` ("
             "`start_food` INT NOT NULL,"
@@ -43,7 +42,6 @@ class tables_description:
             "INDEX `id_start` (`start_food` ASC) VISIBLE,"
             "INDEX `id_substitute` (`substitute_food` ASC) VISIBLE"
             ") ENGINE = InnoDB;")
-
         self.TABLES['categories'] = (
             "CREATE TABLE IF NOT EXISTS `categories` ("
             "`category_id` INT NOT NULL AUTO_INCREMENT,"
@@ -51,7 +49,6 @@ class tables_description:
             "PRIMARY KEY (`category_id`),"
             "UNIQUE INDEX `category` (`category_id` ASC) VISIBLE"
             ") ENGINE = InnoDB;")
-
         self.TABLES['food_datas'] = (
             "CREATE TABLE IF NOT EXISTS `food_datas` ("
             "`id` INT NOT NULL AUTO_INCREMENT,"
@@ -86,7 +83,7 @@ class datas_description:
         self.API = {"pates-a-tartiner" : 'https://fr.openfoodfacts.org/categorie/pates-a-tartiner/1.json', "popcorn" : 'https://fr.openfoodfacts.org/categorie/popcorn/1.json', "brioches" : 'https://fr.openfoodfacts.org/categorie/brioches/1.json'}
         self.check_categories = "SELECT * FROM categories"
         self.check_datas = "SELECT * FROM food_datas"
-    
+
     def validate_string(self, val):
         if val != None:
                 if type(val) is int:
@@ -126,11 +123,11 @@ class datas_description:
                     id_cat = cursor.fetchone()[0]
                     json_obj = [json.loads((urllib.request.urlopen(values)).read())][0]['products']
                     for i, item in enumerate(json_obj) :
-                        product_name = self.validate_string(item.get("product_name", None))
-                        brands = self.validate_string(item.get("brands", None))
-                        nutrition_grade_fr = self.validate_string(item.get("nutrition_grade_fr", None))
-                        stores = self.validate_string(item.get("stores", None))
-                        image_url = self.validate_string(item.get("image_url", None))
+                        product_name = validate_string(item.get("product_name", None))
+                        brands = validate_string(item.get("brands", None))
+                        nutrition_grade_fr = validate_string(item.get("nutrition_grade_fr", None))
+                        stores = validate_string(item.get("stores", None))
+                        image_url = validate_string(item.get("image_url", None))
                         execute = f"INSERT INTO food_datas (id_category, product_name, brands, nutrition_grade_fr, stores, image_url) VALUES ({id_cat}, '{product_name}', '{brands}', '{nutrition_grade_fr}', '{stores}', '{image_url}')"
                         cursor.execute(execute)
                         print(execute)
