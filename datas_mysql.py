@@ -4,21 +4,23 @@ import mysql.connector
 import json
 import urllib.request
 
+
 class database_coordinates:
     def __init__(self):
         self.user = 'root'
         self.password = 'Arnaud31'
         self.host = '127.0.0.1'
         self.database = 'purbeurre'
-    
+
     def create_database(self, cursor):
         try:
             cursor.execute(
-                "CREATE DATABASE {} DEFAULT CHARACTER SET `utf8`".format(self.database))
+                "CREATE DATABASE {} DEFAULT CHARACTER SET `utf8`"
+                .format(self.database))
         except mysql.connector.Error as err:
             print("Failed creating database: {}".format(err))
             exit(1)
-    
+
     def use_database(self, cursor):
         try:
             cursor.execute("USE {}".format(self.database))
@@ -26,11 +28,13 @@ class database_coordinates:
             print("Database {} does not exists.".format(self.database))
             if err.errno == errorcode.ER_BAD_DB_ERROR:
                 create_database(cursor)
-                print("Database {} created successfully.".format(self.database))
+                print("Database {} created successfully."
+                .format(self.database))
                 cnx.database = self.database
             else:
                 print(err)
                 exit(1)
+
 
 class tables_description:
     def __init__(self):
@@ -78,58 +82,60 @@ class tables_description:
             else:
                 print("OK")
 
-class datas_description:
+class categories_description:
     def __init__(self):
-        self.API = {"pates-a-tartiner" : 'https://fr.openfoodfacts.org/categorie/pates-a-tartiner/1.json', "popcorn" : 'https://fr.openfoodfacts.org/categorie/popcorn/1.json', "brioches" : 'https://fr.openfoodfacts.org/categorie/brioches/1.json'}
+        self.categories = ["pates-a-tartiner", "popcorn", "brioches"]
         self.check_categories = "SELECT * FROM categories"
         self.check_datas = "SELECT * FROM food_datas"
 
     def validate_string(self, val):
         if val != None:
                 if type(val) is int:
-                    #for x in val:
-                    #   print(x)
                     return str(val).encode('utf-8')
                 else:
                     if val == str(""):
                         return None
                     else:
                         return val.replace("'","_")
-
-    def find_key(self, values): 
-        for k, val in self.API.items(): 
-            if val == values:
-                return k
-    
+ 
     def insert_into_categories(self, cursor):
         exec_check = cursor.execute(self.check_categories)
         cursor.fetchall()
         row = cursor.rowcount
         if row <= 0:
-            for key in self.API.keys() :
-                exec_cat = f"INSERT INTO categories (category) VALUES ('{key}')"
+            for categories in self.categories :
+                exec_cat = f"INSERT INTO categories (category) VALUES ('{categories}')"
                 cursor.execute(exec_cat)
         else :
             print("already exist")
 
+class API:
+    def __init__(self):
+        self.categories_description = categories_description()
+        self.API = {self.categories_description.categories[0] : 'https://fr.openfoodfacts.org/categorie/pates-a-tartiner/1.json', self.categories_description.categories[1] : 'https://fr.openfoodfacts.org/categorie/popcorn/1.json', self.categories_description.categories[2]: 'https://fr.openfoodfacts.org/categorie/brioches/1.json'}
+        self.json_obj = [json.loads((urllib.request.urlopen(self.API.values)).read())][0]['products']
+
+class datas_description:
+    def __init__(self, product_name, brands, nutrition_grade_fr, stores, image_url):
+        self.product_name = categories_description.validate_string(API.json_obj.item.get(product_name, None))
+        self.brands = categories_description.validate_string(API.json_obj.item.get(brands, None))
+        self.nutrition_grade_fr = nutrition_grade_fr = categories_description.validate_string(API.json_obj.item.get(nutrition_grade_fr, None))
+        self.stores = categories_description.validate_string(API.json_obj.item.get(stores, None))
+        self.image_url = categories_description.validate_string(API.json_obj.item.get(image_url, None))
+        self.check_datas = "SELECT * FROM food_datas"
+    
     def insert_into_food_datas(self, cursor):
         exec_check = cursor.execute(self.check_datas)
         cursor.fetchall()
         row = cursor.rowcount
         if row <= 0:
-            for key, values in self.API.items():
+            for key, values in API.API.items():
                     req_id_cat = (f"SELECT category_id FROM categories WHERE category = '{key}' LIMIT 1")
                     exec_id_cat = cursor.execute(req_id_cat)
                     id_cat = cursor.fetchone()[0]
-                    json_obj = [json.loads((urllib.request.urlopen(values)).read())][0]['products']
-                    for i, item in enumerate(json_obj) :
-                        product_name = validate_string(item.get("product_name", None))
-                        brands = validate_string(item.get("brands", None))
-                        nutrition_grade_fr = validate_string(item.get("nutrition_grade_fr", None))
-                        stores = validate_string(item.get("stores", None))
-                        image_url = validate_string(item.get("image_url", None))
-                        execute = f"INSERT INTO food_datas (id_category, product_name, brands, nutrition_grade_fr, stores, image_url) VALUES ({id_cat}, '{product_name}', '{brands}', '{nutrition_grade_fr}', '{stores}', '{image_url}')"
+                    for i, item in enumerate(API.json_obj) :
+                        execute = f"INSERT INTO food_datas (id_category, product_name, brands, nutrition_grade_fr, stores, image_url) VALUES ({id_cat}, '{self.product_name}', '{self.brands}', '{self.nutrition_grade_fr}', '{self.stores}', '{self.image_url}')"
                         cursor.execute(execute)
                         print(execute)
         else :
-            print("already exist")  
+            print("already exist")

@@ -1,3 +1,0 @@
-list = [('Popitas Palomitas Dulces', 'b'), ('PopCorn', 'd'), ('Mais pop corn', 'a'), ('Rigopop', 'd'), ('Pop Corn', 'd'), ('Top corn', 'd'), ('F.ravich Crisp.colors', 'c'), ('Pop corn sucre parc Asterix', 'd'), ('Pop corn', 'd'), ('Pop corn Lima & Pimienta', 'd'), ('Popcorn sucré', 'd'), ('Freches Popcorn Banane', 'c'), ('Pop Corn Sucre', 'd'), ('Palomitas dulces', 'd')]
-list_select = list[()]
-print(list_select)
