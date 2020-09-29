@@ -7,7 +7,8 @@ class program_execute:
         self.food_substituted = []
 
     def select_categories(self):
-        execute = "SELECT product_name, nutrition_grade_fr FROM purbeurre.food_datas WHERE id IN (SELECT substitute_food FROM purbeurre.storage)"
+        execute = "SELECT product_name," "nutrition_grade_fr" 
+        "FROM purbeurre.food_datas WHERE id IN (SELECT substitute_food FROM purbeurre.storage)"
         self.cursor.execute(execute)
         food_already_substituted = self.cursor.fetchall()
         print("Liste des aliments déjà substitués : ", food_already_substituted)
@@ -22,7 +23,10 @@ class program_execute:
     def generate_foods_list(self, answer):
         execute = f"SELECT category FROM categories WHERE category = '{answer}'"
         self.cursor.execute(execute)
-        execute = f"SELECT product_name FROM purbeurre.food_datas INNER JOIN purbeurre.categories ON id_category = category_id WHERE category = '{answer}'"
+        execute = "SELECT product_name "
+        "FROM purbeurre.food_datas "
+        "INNER JOIN purbeurre.categories ON id_category = category_id "
+        f"WHERE category = '{answer}'"
         self.cursor.execute(execute)
         foods = self.cursor.fetchall()
         for tuples in foods: 
@@ -31,13 +35,17 @@ class program_execute:
         print(self.foods_list)
 
     def select_food(self, answer):
-        execute = f"SELECT product_name, nutrition_grade_fr FROM purbeurre.food_datas WHERE product_name='{answer}'"
+        execute = "SELECT product_name, nutrition_grade_fr" 
+        "FROM purbeurre.food_datas "
+        f"WHERE product_name='{answer}'"
         self.cursor.execute(execute)
         self.food_selected = self.cursor.fetchone()
         print("nom : ", self.food_selected[0], ", nutriscore : ", self.food_selected[1])
 
     def searching_better_food(self, answer):
-        execute = f"SELECT product_name, nutrition_grade_fr FROM purbeurre.food_datas  WHERE id_category = (SELECT category_id FROM purbeurre.categories WHERE category = '{answer}') AND nutrition_grade_fr = (SELECT MIN(nutrition_grade_fr) FROM purbeurre.food_datas)"
+        execute = "SELECT product_name, nutrition_grade_fr FROM purbeurre.food_datas "
+        "WHERE id_category = (SELECT category_id FROM purbeurre.categories "
+        f"WHERE category = '{answer}') AND nutrition_grade_fr = (SELECT MIN(nutrition_grade_fr) FROM purbeurre.food_datas)"
         self.cursor.execute(execute)
         self.food_selected = self.cursor.fetchone()
         print("Nous avons trouvé : ", self.food_selected)

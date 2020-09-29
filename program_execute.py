@@ -18,9 +18,12 @@ coordinates = database_coordinates()
 table = tables_description()
 categories = categories_description()
 API = API()
-datas = datas_description("product_name", "brands", "nutrition_grade_fr", "stores", "image_url")
+datas = datas_description()
 
-cnx = connection.MySQLConnection(user = coordinates.user, password = coordinates.password, host = coordinates.host, database = coordinates.database)
+cnx = connection.MySQLConnection(user = coordinates.user, 
+    password = coordinates.password, 
+    host = coordinates.host, 
+    database = coordinates.database)
 cursor = cnx.cursor(buffered=True)
 
 coordinates.use_database(cursor)

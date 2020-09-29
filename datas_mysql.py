@@ -112,18 +112,30 @@ class categories_description:
 class API:
     def __init__(self):
         self.categories_description = categories_description()
-        self.API = {self.categories_description.categories[0] : 'https://fr.openfoodfacts.org/categorie/pates-a-tartiner/1.json', self.categories_description.categories[1] : 'https://fr.openfoodfacts.org/categorie/popcorn/1.json', self.categories_description.categories[2]: 'https://fr.openfoodfacts.org/categorie/brioches/1.json'}
-        self.urllib = urllib.request.urlopen(self.API.values)
-        self.json_obj = [json.loads((self.urllib).read())][0]['products']
+        self.API = {self.categories_description.categories[0] : 'https://fr.openfoodfacts.org/categorie/pates-a-tartiner/1.json', 
+            self.categories_description.categories[1] : 'https://fr.openfoodfacts.org/categorie/popcorn/1.json', 
+            self.categories_description.categories[2] : 'https://fr.openfoodfacts.org/categorie/brioches/1.json'}
+        for url in self.API.values():
+            data = urllib.request.urlopen(url).read()
+            self.dict_data = [json.loads(data)][0]['products']
+
+
 
 class datas_description:
-    def __init__(self, product_name, brands, nutrition_grade_fr, stores, image_url):
-        self.product_name = categories_description.validate_string(API.json_obj.item.get(product_name, None))
-        self.brands = categories_description.validate_string(API.json_obj.item.get(brands, None))
-        self.nutrition_grade_fr = nutrition_grade_fr = categories_description.validate_string(API.json_obj.item.get(nutrition_grade_fr, None))
-        self.stores = categories_description.validate_string(API.json_obj.item.get(stores, None))
-        self.image_url = categories_description.validate_string(API.json_obj.item.get(image_url, None))
+    def __init__(self):
+        self.API = API()
         self.check_datas = "SELECT * FROM food_datas"
+        self.product_name = categories_description.validate_string(
+            self.API.dict_data.item.get('product_name', None))
+        self.brands = categories_description.validate_string(
+            self.API.dict_data.item.get('brands', None))
+        self.nutrition_grade_fr = nutrition_grade_fr = categories_description.validate_string(
+            self.API.dict_data.item.get('nutrition_grade_fr', None))
+        self.stores = categories_description.validate_string(
+            self.API.dict_data.item.get('stores', None))
+        self.image_url = categories_description.validate_string(
+            self.API.dict_data.item.get("image_url", None))
+
     
     def insert_into_food_datas(self, cursor):
         exec_check = cursor.execute(self.check_datas)
@@ -134,8 +146,9 @@ class datas_description:
                     req_id_cat = (f"SELECT category_id FROM categories WHERE category = '{key}' LIMIT 1")
                     exec_id_cat = cursor.execute(req_id_cat)
                     id_cat = cursor.fetchone()[0]
-                    for i, item in enumerate(API.json_obj) :
-                        execute = f"INSERT INTO food_datas (id_category, product_name, brands, nutrition_grade_fr, stores, image_url) VALUES ({id_cat}, '{self.product_name}', '{self.brands}', '{self.nutrition_grade_fr}', '{self.stores}', '{self.image_url}')"
+                    for i, item in enumerate(self.API.products_by_cat) :
+                        execute = "INSERT INTO food_datas (id_category, product_name, brands, nutrition_grade_fr, stores, image_url) " 
+                        f"VALUES ({id_cat}, '{self.product_name}', '{self.brands}', '{self.nutrition_grade_fr}', '{self.stores}', '{self.image_url}')"
                         cursor.execute(execute)
                         print(execute)
         else :
