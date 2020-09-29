@@ -113,7 +113,8 @@ class API:
     def __init__(self):
         self.categories_description = categories_description()
         self.API = {self.categories_description.categories[0] : 'https://fr.openfoodfacts.org/categorie/pates-a-tartiner/1.json', self.categories_description.categories[1] : 'https://fr.openfoodfacts.org/categorie/popcorn/1.json', self.categories_description.categories[2]: 'https://fr.openfoodfacts.org/categorie/brioches/1.json'}
-        self.json_obj = [json.loads((urllib.request.urlopen(self.API.values)).read())][0]['products']
+        self.urllib = urllib.request.urlopen(self.API.values)
+        self.json_obj = [json.loads((self.urllib).read())][0]['products']
 
 class datas_description:
     def __init__(self, product_name, brands, nutrition_grade_fr, stores, image_url):
