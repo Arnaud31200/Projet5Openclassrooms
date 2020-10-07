@@ -5,6 +5,28 @@ import json
 import urllib.request
 
 
+
+#with open("ressources.txt", "r") as ressources:
+    #for lines in ressources.readlines():
+        #categories = []
+        #categories.append(lines)
+
+
+categories = [
+"pates-a-tartiner",
+"popcorn",
+"brioches",
+"pains",
+"viandes",
+"boissons",
+]
+
+API_dict = {}
+
+for cat in categories:
+    values = f'https://fr.openfoodfacts.org/categorie/{cat}/1.json'
+    API_dict[cat] = values
+
 class database_coordinates:
     def __init__(self):
         self.user = 'root'
@@ -35,7 +57,6 @@ class database_coordinates:
                 print(err)
                 exit(1)
 
-
 class tables_description:
     def __init__(self):
         self.TABLES = {}
@@ -57,10 +78,10 @@ class tables_description:
             "CREATE TABLE IF NOT EXISTS `food_datas` ("
             "`id` INT NOT NULL AUTO_INCREMENT,"
             "`id_category` INT NOT NULL,"
-            "`product_name` VARCHAR(70) NOT NULL,"
-            "`brands` VARCHAR(70) NOT NULL,"
-            "`nutrition_grade_fr` VARCHAR(70) NOT NULL,"
-            "`stores` VARCHAR(70),"
+            "`product_name` VARCHAR(100) NOT NULL,"
+            "`brands` VARCHAR(100) NOT NULL,"
+            "`nutrition_grade_fr` VARCHAR(100) NOT NULL,"
+            "`stores` VARCHAR(100),"
             "`image_url` VARCHAR(100) NOT NULL,"
             "PRIMARY KEY (`id`),"
             "CONSTRAINT `key_category`"
@@ -84,71 +105,51 @@ class tables_description:
 
 class categories_description:
     def __init__(self):
-        self.categories = ["pates-a-tartiner", "popcorn", "brioches"]
         self.check_categories = "SELECT * FROM categories"
         self.check_datas = "SELECT * FROM food_datas"
 
-    def validate_string(self, val):
-        if val != None:
-                if type(val) is int:
-                    return str(val).encode('utf-8')
-                else:
-                    if val == str(""):
-                        return None
-                    else:
-                        return val.replace("'","_")
- 
     def insert_into_categories(self, cursor):
         exec_check = cursor.execute(self.check_categories)
         cursor.fetchall()
         row = cursor.rowcount
         if row <= 0:
-            for categories in self.categories :
-                exec_cat = f"INSERT INTO categories (category) VALUES ('{categories}')"
+            for key in API_dict :
+                exec_cat = f"INSERT INTO categories (category) VALUES ('{key}')"
                 cursor.execute(exec_cat)
         else :
             print("already exist")
 
-class API:
-    def __init__(self):
-        self.categories_description = categories_description()
-        self.API = {self.categories_description.categories[0] : 'https://fr.openfoodfacts.org/categorie/pates-a-tartiner/1.json', 
-            self.categories_description.categories[1] : 'https://fr.openfoodfacts.org/categorie/popcorn/1.json', 
-            self.categories_description.categories[2] : 'https://fr.openfoodfacts.org/categorie/brioches/1.json'}
-        for url in self.API.values():
-            data = urllib.request.urlopen(url).read()
-            self.dict_data = [json.loads(data)][0]['products']
-
-
-
 class datas_description:
     def __init__(self):
-        self.API = API()
         self.check_datas = "SELECT * FROM food_datas"
-        self.product_name = categories_description.validate_string(
-            self.API.dict_data.item.get('product_name', None))
-        self.brands = categories_description.validate_string(
-            self.API.dict_data.item.get('brands', None))
-        self.nutrition_grade_fr = nutrition_grade_fr = categories_description.validate_string(
-            self.API.dict_data.item.get('nutrition_grade_fr', None))
-        self.stores = categories_description.validate_string(
-            self.API.dict_data.item.get('stores', None))
-        self.image_url = categories_description.validate_string(
-            self.API.dict_data.item.get("image_url", None))
 
-    
+    def validate_string(self, val):
+        if val != None:
+            if type(val) is int:
+                return str(val).encode('utf-8')
+            else:
+                if val == str(""):
+                    return None
+                else:
+                    return val.replace("'","_")
+
     def insert_into_food_datas(self, cursor):
         exec_check = cursor.execute(self.check_datas)
         cursor.fetchall()
         row = cursor.rowcount
         if row <= 0:
-            for key, values in API.API.items():
+            for key, values in API_dict.items():
                     req_id_cat = (f"SELECT category_id FROM categories WHERE category = '{key}' LIMIT 1")
                     exec_id_cat = cursor.execute(req_id_cat)
                     id_cat = cursor.fetchone()[0]
-                    for i, item in enumerate(self.API.products_by_cat) :
-                        execute = "INSERT INTO food_datas (id_category, product_name, brands, nutrition_grade_fr, stores, image_url) " 
-                        f"VALUES ({id_cat}, '{self.product_name}', '{self.brands}', '{self.nutrition_grade_fr}', '{self.stores}', '{self.image_url}')"
+                    json_obj = [json.loads((urllib.request.urlopen(values)).read())][0]['products']
+                    for i, item in enumerate(json_obj) :
+                        product_name = self.validate_string(item.get("product_name", None))
+                        brands = self.validate_string(item.get("brands", None))
+                        nutrition_grade_fr = self.validate_string(item.get("nutrition_grade_fr", None))
+                        stores = self.validate_string(item.get("stores", None))
+                        image_url = self.validate_string(item.get("image_url", None))
+                        execute = f"INSERT INTO food_datas (id_category, product_name, brands, nutrition_grade_fr, stores, image_url) VALUES ({id_cat}, '{product_name}', '{brands}', '{nutrition_grade_fr}', '{stores}', '{image_url}')"
                         cursor.execute(execute)
                         print(execute)
         else :
