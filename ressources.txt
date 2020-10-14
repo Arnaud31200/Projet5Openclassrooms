@@ -4,3 +4,4 @@ brioches
 pains
 viandes
 boissons
+fromages
