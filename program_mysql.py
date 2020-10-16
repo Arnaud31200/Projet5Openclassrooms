@@ -7,8 +7,8 @@ class program_execute:
         self.food_substituted = []
 
     def select_categories(self):
-        execute = ("SELECT product_name, nutrition_grade_fr"
-            "FROM purbeurre.food_datas WHERE id"
+        execute = ("SELECT product_name, nutrition_grade_fr "
+            "FROM purbeurre.food_datas WHERE id "
             "IN (SELECT substitute_food FROM purbeurre.storage)")
         self.cursor.execute(execute)
         food_already_substituted = self.cursor.fetchall()
