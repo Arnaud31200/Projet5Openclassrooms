@@ -1,8 +1,8 @@
-from datas_mysql import database_coordinates
-from datas_mysql import tables_description
-from datas_mysql import categories_description
-from datas_mysql import datas_description
-from datas_mysql import creating_API
+from datas_mysql import Database_coordinates
+from datas_mysql import Tables_description
+from datas_mysql import Categories_description
+from datas_mysql import Datas_description
+from datas_mysql import Creating_API
 from program_mysql import program_execute
 from mysql.connector import (connection)
 from random import choice
@@ -16,11 +16,11 @@ def main():
 
 
 main()
-coordinates = database_coordinates()
-table = tables_description()
-ressources = creating_API()
-categories = categories_description(ressources.API_dict)
-datas = datas_description(ressources.API_dict)
+coordinates = Database_coordinates()
+table = Tables_description()
+ressources = Creating_API()
+categories = Categories_description(ressources.API_dict)
+datas = Datas_description(ressources.API_dict)
 
 cnx = connection.MySQLConnection(user = coordinates.user,
     password = coordinates.password,

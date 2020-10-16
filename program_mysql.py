@@ -1,4 +1,4 @@
-class program_execute:
+class Program_execute:
     def __init__(self, cursor):
         self.cursor = cursor
         self.categories_list = []

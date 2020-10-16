@@ -15,7 +15,7 @@ def validate_string(val) :
                 return val.replace("'", "_")
 
 
-class database_coordinates:
+class Database_coordinates:
     def __init__(self) :
         self.user = 'root'
         self.password = 'Arnaud31'
@@ -44,7 +44,7 @@ class database_coordinates:
                 exit(1)
 
 
-class tables_description :
+class Tables_description :
     def __init__(self) :
         self.TABLES = {}
         self.TABLES['storage'] = (
@@ -91,7 +91,7 @@ class tables_description :
                 print("OK")
 
 
-class creating_API :
+class Creating_API :
     def __init__(self) :
         self.categories = []
         self.API_dict = {}
@@ -105,7 +105,7 @@ class creating_API :
             values = f'https://fr.openfoodfacts.org/categorie/{cat}/1.json'
             self.API_dict[cat] = values
 
-class categories_description :
+class Categories_description :
     def __init__(self, API) :
         self.API = API
         self.check_categories = "SELECT * FROM categories"
@@ -123,7 +123,7 @@ class categories_description :
         else :
             print("already exist")
 
-class datas_description :
+class Datas_description :
     def __init__(self, API) :
         self.API = API
         self.check_datas = "SELECT * FROM food_datas"
