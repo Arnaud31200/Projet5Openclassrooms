@@ -5,3 +5,4 @@ pains
 viandes
 boissons
 fromages
+compotes-de-pomme

@@ -84,7 +84,7 @@ class Tables_description :
                 cursor.execute(table_description)
             except mysql.connector.Error as err :
                 if err.errno == errorcode.ER_TABLE_EXISTS_ERROR :
-                    print("already exists.")
+                    print("Table already exists.")
                 else :
                     print(err.msg)
             else :
@@ -108,41 +108,72 @@ class Creating_API :
 class Categories_description :
     def __init__(self, API) :
         self.API = API
-        self.check_categories = "SELECT * FROM categories"
-        self.check_datas = "SELECT * FROM food_datas"
+        self.check_categories = "SELECT category FROM categories"
+        self.categories_list = []
+
+    def insertion_funct(self, cursor, key) :
+        exec_cat = ("INSERT INTO categories (category) "
+            f"VALUES ('{key}')")
+        cursor.execute(exec_cat)
+        print("Category added")
 
     def insert_into_categories(self, cursor) :
         exec_check = cursor.execute(self.check_categories)
-        cursor.fetchall()
+        categories_database = cursor.fetchall()
+        for tuples in categories_database :
+            for i in tuples :
+                self.categories_list.append(i)
         row = cursor.rowcount
         if row <= 0 :
             for key in self.API :
-                exec_cat = ("INSERT INTO categories (category) "
-                    f"VALUES ('{key}')")
-                cursor.execute(exec_cat)
-        else :
-            print("already exist")
+                self.insertion_funct(cursor, key)
+        elif row > 0 :
+            for key in self.API :
+                if key not in self.categories_list :
+                    self.insertion_funct(cursor, key)
+                else :
+                    print("Category already exists")
 
 class Datas_description :
-    def __init__(self, API) :
+    def __init__(self, API, categories) :
         self.API = API
+        self.categories = categories
         self.check_datas = "SELECT * FROM food_datas"
-        for key, values in self.API.items() :
-            self.req_id_cat = ("SELECT category_id "
-                f"FROM categories WHERE category = '{key}' LIMIT 1")
-            self.json_obj = [json.loads(
-                (urllib.request.urlopen(values)).read())][0]['products']
-            for i, item in enumerate(self.json_obj) :
-                self.product_name = validate_string(item.get(
-                    "product_name", None))
-                self.brands = validate_string(item.get(
-                    "brands", None))
-                self.nutrition_grade_fr = validate_string(item.get(
-                    "nutrition_grade_fr", None))
-                self.stores = validate_string(item.get(
-                    "stores", None))
-                self.image_url = validate_string(item.get(
-                    "image_url", None))
+
+    def insertion_funct(self, cursor, key, values) :
+        req_id_cat = ("SELECT category_id "
+        f"FROM categories WHERE category = '{key}' LIMIT 1")
+        exec_id_cat = cursor.execute(req_id_cat)
+        id_cat = cursor.fetchone()[0]
+        json_obj = [json.loads(
+        (urllib.request.urlopen(values)).read())][0]['products']
+        for i, item in enumerate(json_obj) :
+            product_name = validate_string(item.get(
+                "product_name", None))
+            brands = validate_string(item.get(
+                "brands", None))
+            nutrition_grade_fr = validate_string(item.get(
+                "nutrition_grade_fr", None))
+            stores = validate_string(item.get(
+                "stores", None))
+            image_url = validate_string(item.get(
+                "image_url", None))
+            execute = ("INSERT INTO food_datas "
+                "(id_category, "
+                "product_name, "
+                "brands, "
+                "nutrition_grade_fr, "
+                "stores, "
+                "image_url)"
+                f"VALUES ({id_cat}, "
+                f"'{product_name}', "
+                f"'{brands}', "
+                f"'{nutrition_grade_fr}', "
+                f"'{stores}', "
+                f"'{image_url}')")
+            cursor.execute(execute)
+            print(execute)
+
 
     def insert_into_food_datas(self, cursor) :
         exec_check = cursor.execute(self.check_datas)
@@ -150,24 +181,10 @@ class Datas_description :
         row = cursor.rowcount
         if row <= 0 :
             for key, values in self.API.items() :
-                exec_id_cat = cursor.execute(self.req_id_cat)
-                id_cat = cursor.fetchone()[0]
-                for i, item in enumerate(self.json_obj) :
-                    execute = ("INSERT INTO food_datas "
-                        "(id_category, "
-                        "product_name, "
-                        "brands, "
-                        "nutrition_grade_fr, "
-                        "stores, "
-                        "image_url)"
-                        f"VALUES ({id_cat}, "
-                        f"'{self.product_name}', "
-                        f"'{self.brands}', "
-                        f"'{self.nutrition_grade_fr}', "
-                        f"'{self.stores}', "
-                        f"'{self.image_url}')")
-                    cursor.execute(execute)
-                    print(execute)
-        else :
-            print("already exist")
-
+                self.insertion_funct(cursor, key, values)
+        elif row > 0 :
+            for key, values in self.API.items() :
+                if key not in self.categories :
+                    self.insertion_funct(cursor, key, values)
+                else :
+                    print("Datas already exists")

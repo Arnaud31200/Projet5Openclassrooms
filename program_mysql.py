@@ -1,5 +1,5 @@
-class Program_execute:
-    def __init__(self, cursor):
+class Program_execute :
+    def __init__(self, cursor) :
         self.cursor = cursor
         self.categories_list = []
         self.foods_list = []
@@ -14,7 +14,7 @@ class Program_execute:
         food_already_substituted = self.cursor.fetchall()
         print("Liste des aliments déjà substitués :"
             , food_already_substituted)
-        execute = f"SELECT category FROM categories"
+        execute = "SELECT category FROM categories"
         self.cursor.execute(execute)
         categories = self.cursor.fetchall()
         for tuples in categories :
