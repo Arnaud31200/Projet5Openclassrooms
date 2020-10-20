@@ -29,4 +29,4 @@ Comment le développeur comprendra le code ?
 - Une partie programme en Python :
     - Le programme Sélectionnera l'aliment choisi dans la base de données.
     - Le programme proposera un subsistut.
-    - Le programme enregistrera le résultat sur la base de données
+    - Le programme enregistrera le résultat sur la base de données.

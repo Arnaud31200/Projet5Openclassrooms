@@ -30,17 +30,19 @@ def main():
             table.create_tables(cursor)
             cnx.commit()
 
+
         def datas_insertion(cursor) :
             categories.insert_into_categories(cursor)
             datas.insert_into_food_datas(cursor)
             cnx.commit()
 
+
         def run_program(cursor) :
             program = Program_execute(cursor)
             program.select_categories()
+            
             good_answer = [f"{choice(program.categories_list)}"]
             user_input = ""
-
             while user_input not in good_answer :
                 answer1 = str(input("Choisissez une catégorie : "))
                 if answer1 in program.categories_list :
@@ -83,10 +85,12 @@ def main():
             cursor.close()
             cnx.close()
 
+
         user_input = ""
         good_answer = ["Tables", "Données", "Executer"]
         while user_input not in good_answer :
-            welcome_answer = str(input("Voulez-vous ?  Tables/Données/Executer "))
+            welcome_answer = str(input("Voulez-vous ? "
+                "Tables/Données/Executer "))
             if welcome_answer == "Tables" :
                 tables_insertions(cursor)
                 print("Insertion terminée")
@@ -103,5 +107,6 @@ def main():
                 print("Réponse incorrecte ! Réessayez !")
     else :
         print("Script imported")
+
 
 main()
