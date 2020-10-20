@@ -2,18 +2,19 @@ from datas_mysql import Database_coordinates
 from datas_mysql import Tables_description
 from datas_mysql import Categories_description
 from datas_mysql import Datas_description
-from datas_mysql import Creating_API
+from datas_mysql import Create_API
 from program_mysql import Program_execute
 from mysql.connector import (connection)
 from random import choice
 
 def main():
+    """Enable main function"""
     if __name__ == "__main__" :
         print("Script directly executed")
 
         coordinates = Database_coordinates()
         table = Tables_description()
-        ressources = Creating_API()
+        ressources = Create_API()
         categories = Categories_description(ressources.API_dict)
         datas = Datas_description(ressources.API_dict, categories.categories_list)
 
@@ -25,7 +26,7 @@ def main():
         cursor = cnx.cursor(buffered=True)
 
         coordinates.use_database(cursor)
-        table.creating_tables(cursor)
+        table.create_tables(cursor)
         cnx.commit()
 
         categories.insert_into_categories(cursor)
@@ -43,7 +44,7 @@ def main():
                 program.generate_foods_list(answer1)
                 break
             elif answer1 not in program.categories_list :
-                print("catégorie inexistante ! Réessayez !")
+                print("Catégorie inexistante ! Réessayez !")
 
         good_answer = [f'{choice(program.foods_list)}']
         while user_input not in good_answer :
@@ -56,7 +57,7 @@ def main():
 
         good_answer = ["Oui", "Non"]
         while user_input not in good_answer :
-            answer3 = str(input("Rechercher un aliment plus équilibré ?"))
+            answer3 = str(input("Voulez-vous rechercher un aliment plus équilibré ? Oui/Non "))
             if answer3 == "Oui" :
                 program.searching_better_food(answer1)
                 break
@@ -67,9 +68,9 @@ def main():
                 print("Réponse incorrecte ! Réessayez !")
 
         while user_input not in good_answer and answer3 != "Non" :
-            answer4 = str(input("Stocker l'aliment sélectionné ? "))
+            answer4 = str(input("Voulez-vous stocker l'aliment sélectionné ? Oui/Non "))
             if answer4 == "Oui" :
-                program.id_food_storage(answer4)
+                program.id_food_storage(answer2)
                 break
             elif answer4 == "Non" :
                 print("Recherche terminée")
@@ -80,7 +81,7 @@ def main():
         cnx.commit()
         cursor.close()
         cnx.close()
-    
+
     else :
         print("Script imported")
 

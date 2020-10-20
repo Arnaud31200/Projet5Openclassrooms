@@ -1,3 +1,4 @@
+"""Import Modules"""
 from __future__ import print_function
 from mysql.connector import errorcode
 import mysql.connector
@@ -5,6 +6,7 @@ import json
 import urllib.request
 
 def validate_string(val) :
+    """ Validate string function"""
     if val is not None :
         if type(val) is int :
             return str(val).encode('utf-8')
@@ -15,7 +17,8 @@ def validate_string(val) :
                 return val.replace("'", "_")
 
 
-class Database_coordinates:
+class Database_coordinates :
+    """ Set database creation"""
     def __init__(self) :
         self.user = 'root'
         self.password = 'Arnaud31'
@@ -23,6 +26,7 @@ class Database_coordinates:
         self.database = 'purbeurre'
 
     def create_database(self, cursor) :
+        """ Creating database function"""
         try :
             cursor.execute("CREATE DATABASE {} "
                 "DEFAULT CHARACTER SET `utf8`".format(self.database))
@@ -31,12 +35,13 @@ class Database_coordinates:
             exit(1)
 
     def use_database(self, cursor) :
+        """Using database function"""
         try :
             cursor.execute("USE {}".format(self.database))
         except mysql.connector.Error as err :
             print("Database {} does not exists.".format(self.database))
             if err.errno == errorcode.ER_BAD_DB_ERROR :
-                create_database(cursor)
+                self.create_database(cursor)
                 print("Database {} created successfully."
                     .format(self.database))
             else:
@@ -45,6 +50,7 @@ class Database_coordinates:
 
 
 class Tables_description :
+    """Set tables creation"""
     def __init__(self) :
         self.TABLES = {}
         self.TABLES['storage'] = (
@@ -73,10 +79,11 @@ class Tables_description :
             "PRIMARY KEY (`id`),"
             "CONSTRAINT `key_category`"
                 "FOREIGN KEY (`id_category`)"
-                "REFERENCES `purbeurre`.`categories` (`category_id`))" 
+                "REFERENCES `purbeurre`.`categories` (`category_id`))"
             "ENGINE = InnoDB;")
 
-    def creating_tables(self, cursor) :
+    def create_tables(self, cursor) :
+        """ Creating tables function"""
         for table_name in self.TABLES :
             table_description = self.TABLES[table_name]
             try :
@@ -90,8 +97,8 @@ class Tables_description :
             else :
                 print("OK")
 
-
-class Creating_API :
+class Create_API :
+    """Set API creation"""
     def __init__(self) :
         self.categories = []
         self.API_dict = {}
@@ -106,19 +113,23 @@ class Creating_API :
             self.API_dict[cat] = values
 
 class Categories_description :
+    """Set categories in database"""
     def __init__(self, API) :
         self.API = API
         self.check_categories = "SELECT category FROM categories"
         self.categories_list = []
 
     def insertion_funct(self, cursor, key) :
+        """Initialize categories insertion"""
         exec_cat = ("INSERT INTO categories (category) "
             f"VALUES ('{key}')")
         cursor.execute(exec_cat)
         print("Category added")
 
+
     def insert_into_categories(self, cursor) :
-        exec_check = cursor.execute(self.check_categories)
+        """Execute categories insertion"""
+        cursor.execute(self.check_categories)
         categories_database = cursor.fetchall()
         for tuples in categories_database :
             for i in tuples :
@@ -135,15 +146,17 @@ class Categories_description :
                     print("Category already exists")
 
 class Datas_description :
+    """ Set datas insertion"""
     def __init__(self, API, categories) :
         self.API = API
         self.categories = categories
         self.check_datas = "SELECT * FROM food_datas"
 
     def insertion_funct(self, cursor, key, values) :
+        """Initialize datas insertion"""
         req_id_cat = ("SELECT category_id "
         f"FROM categories WHERE category = '{key}' LIMIT 1")
-        exec_id_cat = cursor.execute(req_id_cat)
+        cursor.execute(req_id_cat)
         id_cat = cursor.fetchone()[0]
         json_obj = [json.loads(
         (urllib.request.urlopen(values)).read())][0]['products']
@@ -164,18 +177,25 @@ class Datas_description :
                 "brands, "
                 "nutrition_grade_fr, "
                 "stores, "
-                "image_url)"
+                "image_url) "
                 f"VALUES ({id_cat}, "
                 f"'{product_name}', "
                 f"'{brands}', "
                 f"'{nutrition_grade_fr}', "
                 f"'{stores}', "
                 f"'{image_url}')")
+            delete_none_entry = ("DELETE FROM food_datas "
+            "WHERE product_name = 'None' "
+            "OR nutrition_grade_fr = 'None'")
             cursor.execute(execute)
             print(execute)
+            cursor.execute(delete_none_entry)
+            print(delete_none_entry)
+            
 
 
     def insert_into_food_datas(self, cursor) :
+        """Execute datas insertion"""
         exec_check = cursor.execute(self.check_datas)
         cursor.fetchall()
         row = cursor.rowcount
