@@ -82,4 +82,3 @@ class Program_execute :
         print(execute_insertion_storage)
         print("Aliment ajouté avec succés !")
         print("Liste des aliments substitués : ", self.food_substituted)
-        print("Recherche terminée")

@@ -63,7 +63,7 @@ class Tables_description :
         self.TABLES['categories'] = (
             "CREATE TABLE IF NOT EXISTS `categories` ("
             "`category_id` INT NOT NULL AUTO_INCREMENT,"
-            "`category` VARCHAR(100) NOT NULL,"
+            "`category` VARCHAR(50) NOT NULL,"
             "PRIMARY KEY (`category_id`),"
             "UNIQUE INDEX `category` (`category_id` ASC) VISIBLE"
             ") ENGINE = InnoDB;")
@@ -73,7 +73,7 @@ class Tables_description :
             "`id_category` INT NOT NULL,"
             "`product_name` VARCHAR(100) NOT NULL,"
             "`brands` VARCHAR(100) NOT NULL,"
-            "`nutrition_grade_fr` VARCHAR(100) NOT NULL,"
+            "`nutrition_grade_fr` VARCHAR(4) NOT NULL,"
             "`stores` VARCHAR(100),"
             "`image_url` VARCHAR(100) NOT NULL,"
             "PRIMARY KEY (`id`),"

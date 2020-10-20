@@ -25,65 +25,83 @@ def main():
 
         cursor = cnx.cursor(buffered=True)
 
-        coordinates.use_database(cursor)
-        table.create_tables(cursor)
-        cnx.commit()
+        def tables_insertions(cursor) :
+            coordinates.use_database(cursor)
+            table.create_tables(cursor)
+            cnx.commit()
 
-        categories.insert_into_categories(cursor)
-        datas.insert_into_food_datas(cursor)
-        cnx.commit()
+        def datas_insertion(cursor) :
+            categories.insert_into_categories(cursor)
+            datas.insert_into_food_datas(cursor)
+            cnx.commit()
 
-        program = Program_execute(cursor)
-        program.select_categories()
-        good_answer = [f"{choice(program.categories_list)}"]
+        def run_program(cursor) :
+            program = Program_execute(cursor)
+            program.select_categories()
+            good_answer = [f"{choice(program.categories_list)}"]
+            user_input = ""
+
+            while user_input not in good_answer :
+                answer1 = str(input("Choisissez une catégorie : "))
+                if answer1 in program.categories_list :
+                    program.generate_foods_list(answer1)
+                    break
+                elif answer1 not in program.categories_list :
+                    print("Catégorie inexistante ! Réessayez !")
+
+            good_answer = [f'{choice(program.foods_list)}']
+            while user_input not in good_answer :
+                answer2 = str(input("Choisissez un aliment : "))
+                if answer2 in program.foods_list :
+                    program.select_food(answer2)
+                    break
+                elif answer2 not in program.foods_list :
+                    print("Aliment inexistant ! Réessayez !")
+
+            good_answer = ["Oui", "Non"]
+            while user_input not in good_answer :
+                answer3 = str(input("Voulez-vous rechercher un aliment plus équilibré ? Oui/Non "))
+                if answer3 == "Oui" :
+                    program.searching_better_food(answer1)
+                    break
+                elif answer3 == "Non" :
+                    break
+                else :
+                    print("Réponse incorrecte ! Réessayez !")
+
+            while user_input not in good_answer and answer3 != "Non" :
+                answer4 = str(input("Voulez-vous stocker l'aliment sélectionné ? Oui/Non "))
+                if answer4 == "Oui" :
+                    program.id_food_storage(answer2)
+                    break
+                elif answer4 == "Non" :
+                    break
+                else :
+                    print("Réponse incorrecte ! Réessayez !")
+
+            cnx.commit()
+            cursor.close()
+            cnx.close()
+
         user_input = ""
-
+        good_answer = ["Tables", "Données", "Executer"]
         while user_input not in good_answer :
-            answer1 = str(input("Choisissez une catégorie : "))
-            if answer1 in program.categories_list :
-                program.generate_foods_list(answer1)
+            welcome_answer = str(input("Voulez-vous ?  Tables/Données/Executer "))
+            if welcome_answer == "Tables" :
+                tables_insertions(cursor)
+                print("Insertion terminée")
                 break
-            elif answer1 not in program.categories_list :
-                print("Catégorie inexistante ! Réessayez !")
-
-        good_answer = [f'{choice(program.foods_list)}']
-        while user_input not in good_answer :
-            answer2 = str(input("Choisissez un aliment : "))
-            if answer2 in program.foods_list :
-                program.select_food(answer2)
+            elif welcome_answer == "Données" :
+                datas_insertion(cursor)
+                print("Insertion terminée")
                 break
-            elif answer2 not in program.foods_list :
-                print("Aliment inexistant ! Réessayez !")
-
-        good_answer = ["Oui", "Non"]
-        while user_input not in good_answer :
-            answer3 = str(input("Voulez-vous rechercher un aliment plus équilibré ? Oui/Non "))
-            if answer3 == "Oui" :
-                program.searching_better_food(answer1)
-                break
-            elif answer3 == "Non" :
+            elif welcome_answer == "Executer" :
+                run_program(cursor)
                 print("Recherche terminée")
                 break
             else :
                 print("Réponse incorrecte ! Réessayez !")
-
-        while user_input not in good_answer and answer3 != "Non" :
-            answer4 = str(input("Voulez-vous stocker l'aliment sélectionné ? Oui/Non "))
-            if answer4 == "Oui" :
-                program.id_food_storage(answer2)
-                break
-            elif answer4 == "Non" :
-                print("Recherche terminée")
-                break
-            else :
-                print("Réponse incorrecte ! Réessayez !")
-
-        cnx.commit()
-        cursor.close()
-        cnx.close()
-
     else :
         print("Script imported")
-
 
 main()
