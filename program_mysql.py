@@ -9,13 +9,20 @@ class Program_execute :
 
     def select_categories(self):
         """Set categories selection"""
-        execute = ("SELECT product_name, nutrition_grade_fr "
-            "FROM purbeurre.food_datas WHERE id "
-            "IN (SELECT substitute_food FROM purbeurre.storage)")
-        self.cursor.execute(execute)
-        food_already_substituted = self.cursor.fetchall()
-        print("Liste des aliments déjà substitués :"
-            , food_already_substituted)
+        execute_start = ("SELECT product_name, nutrition_grade_fr "
+            "FROM food_datas WHERE id "
+            "IN (SELECT start_food FROM storage)")
+        self.cursor.execute(execute_start)
+        food_start = self.cursor.fetchall()
+        execute_substitute = ("SELECT product_name, nutrition_grade_fr "
+            "FROM food_datas WHERE id "
+            "IN (SELECT substitute_food FROM storage)")
+        self.cursor.execute(execute_substitute)
+        food_substitute = self.cursor.fetchall()
+        print("Liste des aliments déjà substitués :")
+        for x, y in zip(food_start, food_substitute) :
+            print(x, y)
+        print ("Lancement du programme : ")
         execute = "SELECT category FROM categories"
         self.cursor.execute(execute)
         categories = self.cursor.fetchall()
@@ -79,6 +86,4 @@ class Program_execute :
             f"(start_food, substitute_food) VALUES ('{id_start_food[0]}', "
             f"'{id_substitute_food[0]}')")
         self.cursor.execute(execute_insertion_storage)
-        print(execute_insertion_storage)
-        print("Aliment ajouté avec succés !")
-        print("Liste des aliments substitués : ", self.food_substituted)
+        print("l'Aliment ", self.food_selected[0], " a été ajouté avec succés !")

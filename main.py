@@ -8,105 +8,78 @@ from mysql.connector import (connection)
 from random import choice
 
 def main():
-    """Enable main function"""
-    if __name__ == "__main__" :
-        print("Script directly executed")
 
-        coordinates = Database_coordinates()
-        table = Tables_description()
-        ressources = Create_API()
-        categories = Categories_description(ressources.API_dict)
-        datas = Datas_description(ressources.API_dict, categories.categories_list)
+    coordinates = Database_coordinates()
+    table = Tables_description()
+    ressources = Create_API()
+    categories = Categories_description(ressources.API_dict)
+    datas = Datas_description(ressources.API_dict, categories.categories_list)
 
-        cnx = connection.MySQLConnection(user = coordinates.user,
-            password = coordinates.password,
-            host = coordinates.host,
-            database = coordinates.database)
+    cnx = connection.MySQLConnection(user = coordinates.user,
+        password = coordinates.password,
+        host = coordinates.host)
 
-        cursor = cnx.cursor(buffered=True)
+    cursor = cnx.cursor(buffered=True)
 
-        def tables_insertions(cursor) :
-            coordinates.use_database(cursor)
-            table.create_tables(cursor)
-            cnx.commit()
+    coordinates.create_database(cursor)
+    coordinates.use_database(cursor)
+    table.create_tables(cursor)
+    cnx.commit()
 
+    categories.insert_into_categories(cursor)
+    datas.insert_into_food_datas(cursor)
+    cnx.commit()
 
-        def datas_insertion(cursor) :
-            categories.insert_into_categories(cursor)
-            datas.insert_into_food_datas(cursor)
-            cnx.commit()
+    program = Program_execute(cursor)
+    program.select_categories()
 
+    good_answer = [f"{choice(program.categories_list)}"]
+    user_input = ""
+    while user_input not in good_answer :
+        answer1 = str(input("Choisissez une catégorie : "))
+        if answer1 in program.categories_list :
+            program.generate_foods_list(answer1)
+            break
+        elif answer1 not in program.categories_list :
+            print("Catégorie inexistante ! Réessayez !")
 
-        def run_program(cursor) :
-            program = Program_execute(cursor)
-            program.select_categories()
-            
-            good_answer = [f"{choice(program.categories_list)}"]
-            user_input = ""
-            while user_input not in good_answer :
-                answer1 = str(input("Choisissez une catégorie : "))
-                if answer1 in program.categories_list :
-                    program.generate_foods_list(answer1)
-                    break
-                elif answer1 not in program.categories_list :
-                    print("Catégorie inexistante ! Réessayez !")
+    good_answer = [f'{choice(program.foods_list)}']
+    while user_input not in good_answer :
+        answer2 = str(input("Choisissez un aliment : "))
+        if answer2 in program.foods_list :
+            program.select_food(answer2)
+            break
+        elif answer2 not in program.foods_list :
+            print("Aliment inexistant ! Réessayez !")
 
-            good_answer = [f'{choice(program.foods_list)}']
-            while user_input not in good_answer :
-                answer2 = str(input("Choisissez un aliment : "))
-                if answer2 in program.foods_list :
-                    program.select_food(answer2)
-                    break
-                elif answer2 not in program.foods_list :
-                    print("Aliment inexistant ! Réessayez !")
+    good_answer = ["Oui", "Non"]
+    while user_input not in good_answer :
+        answer3 = str(input("Voulez-vous rechercher un aliment plus équilibré ? Oui/Non "))
+        if answer3 == "Oui" :
+            program.searching_better_food(answer1)
+            break
+        elif answer3 == "Non" :
+            print("Fin du programme")
+            break
+        else :
+            print("Réponse incorrecte ! Réessayez !")
 
-            good_answer = ["Oui", "Non"]
-            while user_input not in good_answer :
-                answer3 = str(input("Voulez-vous rechercher un aliment plus équilibré ? Oui/Non "))
-                if answer3 == "Oui" :
-                    program.searching_better_food(answer1)
-                    break
-                elif answer3 == "Non" :
-                    break
-                else :
-                    print("Réponse incorrecte ! Réessayez !")
+    while user_input not in good_answer and answer3 != "Non" :
+        answer4 = str(input("Voulez-vous stocker l'aliment sélectionné ? Oui/Non "))
+        if answer4 == "Oui" :
+            program.id_food_storage(answer2)
+            print("Fin du programme")
+            break
+        elif answer4 == "Non" :
+            print("Fin du programme")
+            break
+        else :
+            print("Réponse incorrecte ! Réessayez !")
 
-            while user_input not in good_answer and answer3 != "Non" :
-                answer4 = str(input("Voulez-vous stocker l'aliment sélectionné ? Oui/Non "))
-                if answer4 == "Oui" :
-                    program.id_food_storage(answer2)
-                    break
-                elif answer4 == "Non" :
-                    break
-                else :
-                    print("Réponse incorrecte ! Réessayez !")
-
-            cnx.commit()
-            cursor.close()
-            cnx.close()
+    cnx.commit()
+    cursor.close()
+    cnx.close()
 
 
-        user_input = ""
-        good_answer = ["Tables", "Données", "Executer"]
-        while user_input not in good_answer :
-            welcome_answer = str(input("Voulez-vous ? "
-                "Tables/Données/Executer "))
-            if welcome_answer == "Tables" :
-                tables_insertions(cursor)
-                print("Insertion terminée")
-                break
-            elif welcome_answer == "Données" :
-                datas_insertion(cursor)
-                print("Insertion terminée")
-                break
-            elif welcome_answer == "Executer" :
-                run_program(cursor)
-                print("Recherche terminée")
-                break
-            else :
-                print("Réponse incorrecte ! Réessayez !")
-    else :
-        print("Script imported")
-
-
-main()
+if __name__ == "__main__":
+    main()

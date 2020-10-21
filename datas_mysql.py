@@ -32,7 +32,9 @@ class Database_coordinates :
                 "DEFAULT CHARACTER SET `utf8`".format(self.database))
         except mysql.connector.Error as err:
             print("Failed creating database: {}".format(err))
-            exit(1)
+            pass
+        else :
+            print("OK")
 
     def use_database(self, cursor) :
         """Using database function"""
@@ -71,11 +73,11 @@ class Tables_description :
             "CREATE TABLE IF NOT EXISTS `food_datas` ("
             "`id` INT NOT NULL AUTO_INCREMENT,"
             "`id_category` INT NOT NULL,"
-            "`product_name` VARCHAR(100) NOT NULL,"
-            "`brands` VARCHAR(100) NOT NULL,"
+            "`product_name` VARCHAR(255) NOT NULL,"
+            "`brands` VARCHAR(255) NOT NULL,"
             "`nutrition_grade_fr` VARCHAR(4) NOT NULL,"
-            "`stores` VARCHAR(100),"
-            "`image_url` VARCHAR(100) NOT NULL,"
+            "`stores` VARCHAR(255),"
+            "`image_url` VARCHAR(255) NOT NULL,"
             "PRIMARY KEY (`id`),"
             "CONSTRAINT `key_category`"
                 "FOREIGN KEY (`id_category`)"
