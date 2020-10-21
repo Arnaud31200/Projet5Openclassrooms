@@ -38,7 +38,8 @@ class Program_execute :
         self.cursor.execute(execute)
         execute = ("SELECT product_name "
             "FROM purbeurre.food_datas "
-            "WHERE id_category = (SELECT category_id FROM purbeurre.categories "
+            "WHERE id_category = ("
+            "SELECT category_id FROM purbeurre.categories "
             f"WHERE category = '{answer}')")
         self.cursor.execute(execute)
         foods = self.cursor.fetchall()
