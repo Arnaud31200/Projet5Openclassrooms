@@ -7,17 +7,17 @@ from program_mysql import Program_execute
 from mysql.connector import (connection)
 from random import choice
 
-def main():
 
+def main():
     coordinates = Database_coordinates()
     table = Tables_description()
     ressources = Create_API()
     categories = Categories_description(ressources.API_dict)
     datas = Datas_description(ressources.API_dict, categories.categories_list)
 
-    cnx = connection.MySQLConnection(user = coordinates.user,
-        password = coordinates.password,
-        host = coordinates.host)
+    cnx = connection.MySQLConnection(user=coordinates.user,
+                                     password=coordinates.password,
+                                     host=coordinates.host)
 
     cursor = cnx.cursor(buffered=True)
 
@@ -35,45 +35,45 @@ def main():
 
     good_answer = [f"{choice(program.categories_list)}"]
     user_input = ""
-    while user_input not in good_answer :
+    while user_input not in good_answer:
         answer1 = str(input("Choisissez une catégorie : "))
-        if answer1 in program.categories_list :
+        if answer1 in program.categories_list:
             program.generate_foods_list(answer1)
             break
-        elif answer1 not in program.categories_list :
+        elif answer1 not in program.categories_list:
             print("Catégorie inexistante ! Réessayez !")
 
     good_answer = [f'{choice(program.foods_list)}']
-    while user_input not in good_answer :
+    while user_input not in good_answer:
         answer2 = str(input("Choisissez un aliment : "))
-        if answer2 in program.foods_list :
+        if answer2 in program.foods_list:
             program.select_food(answer2)
             break
-        elif answer2 not in program.foods_list :
+        elif answer2 not in program.foods_list:
             print("Aliment inexistant ! Réessayez !")
 
     good_answer = ["Oui", "Non"]
-    while user_input not in good_answer :
+    while user_input not in good_answer:
         answer3 = str(input("Voulez-vous rechercher un aliment plus équilibré ? Oui/Non "))
-        if answer3 == "Oui" :
+        if answer3 == "Oui":
             program.searching_better_food(answer1)
             break
-        elif answer3 == "Non" :
+        elif answer3 == "Non":
             print("Fin du programme")
             break
-        else :
+        else:
             print("Réponse incorrecte ! Réessayez !")
 
-    while user_input not in good_answer and answer3 != "Non" :
+    while user_input not in good_answer and answer3 != "Non":
         answer4 = str(input("Voulez-vous stocker l'aliment sélectionné ? Oui/Non "))
-        if answer4 == "Oui" :
+        if answer4 == "Oui":
             program.id_food_storage(answer2)
             print("Fin du programme")
             break
-        elif answer4 == "Non" :
+        elif answer4 == "Non":
             print("Fin du programme")
             break
-        else :
+        else:
             print("Réponse incorrecte ! Réessayez !")
 
     cnx.commit()
